@@ -25,7 +25,7 @@
 #'
 #' @importFrom dplyr near case_when
 #' @export 
-gap_test = function(x, inc = "15 mins", con = c("is", "less than", "greater than")) {
+gap_test = function(x, inc, con = c("is", "less than", "greater than")) {
   if (!any(class(x) %in% c("Date", 'POSIXt')))
     stop('argument "x" must be of class "Date" or "POSIXt"')
   con = match.arg(con, c("is", "less than", "greater than"))
@@ -94,7 +94,7 @@ range_test = function(x, sensor.range, user.range) {
 #' @export
 spike_test = function(x, spike.threshold) {
   case_when(
-   is.na(x) ~ NA_integer_,
+   is.na(x) | is.na(lag(x)) | is.na(lead(x)) ~ NA_integer_,
    abs(x - 0.5 * (lag(x) + lead(x))) > spike.threshold[2] ~ 4L,
    abs(x - 0.5 * (lag(x) + lead(x))) > spike.threshold[1] ~ 3L,
    TRUE ~ 1L
@@ -197,6 +197,7 @@ multivariate_test = function(x, y, n.dev, n.prior) {
     TRUE ~ 1L
   )
 }
+
 
 attenuated_test = function(x, var.threshold, n.prior) {
 
